@@ -1,0 +1,3 @@
+export function SourceStatus({ mode, ready, fetchedAt }: { mode: "monday" | "demo" | "unknown"; ready: boolean; fetchedAt?: string }) {
+  return <section className="source-panel" aria-label="Source health"><div className="rail-label">Source health</div><div className="source-row"><span className={`health-dot ${ready ? "is-ready" : ""}`} /><strong>{mode === "demo" ? "Demo workbooks" : "monday.com"}</strong><span>{ready ? "Ready" : "Checking"}</span></div><div className="board-row"><span>Deals</span><span>{ready ? "Available" : "—"}</span></div><div className="board-row"><span>Work Orders</span><span>{ready ? "Available" : "—"}</span></div>{fetchedAt && <p className="refresh-time">Refreshed {new Date(fetchedAt).toLocaleString()}</p>}</section>;
+}
