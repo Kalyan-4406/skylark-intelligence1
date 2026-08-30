@@ -2,12 +2,34 @@
 
 A founder-facing conversational business-intelligence agent for monday.com Deals and Work Orders. It reads both boards dynamically, normalizes messy fields, performs deterministic analysis, and explains exclusions and data-quality caveats with every answer.
 
+- **Hosted prototype:** [skylark-intelligence-kohl.vercel.app](https://skylark-intelligence-kohl.vercel.app)
+- **Source repository:** [Kalyan-4406/skylark-intelligence1](https://github.com/Kalyan-4406/skylark-intelligence1)
+
+## Assignment coverage
+
+| Requirement | Implementation |
+| --- | --- |
+| Monday.com integration | Read-only, versioned GraphQL API access with cursor pagination across separate Deals and Work Orders boards. |
+| Data resilience | Canonical normalization for inconsistent dates, numbers, names, statuses, and probabilities; unusable values remain null and are excluded only from affected metrics. |
+| Query understanding | OpenAI selects from a constrained tool schema when configured; a deterministic router provides fallback behavior and asks a focused clarification when intent is ambiguous. |
+| Business intelligence | Deterministic pipeline, sector, owner, delivery, billing, collections, receivables, and cross-board analysis. |
+| Leadership updates | On-demand Markdown brief with executive summary, pipeline highlights, delivery risks, observations, caveats, and follow-ups. |
+| Safe failures | Authentication, network, GraphQL, rate-limit, configuration, and analysis failures return generic responses without credentials or upstream bodies. |
+
 ## What it answers
 
 - Pipeline volume, value, weighted value, status, stage, sector, and owner questions.
 - Delayed work orders, execution health, billing, collections, and receivables.
 - High-confidence cross-board summaries using exact normalized deal names.
 - Text-based leadership updates with pipeline highlights, delivery risks, observations, caveats, and follow-ups.
+
+Example prompts:
+
+- `How is our energy-sector pipeline looking?`
+- `Which work orders are delayed?`
+- `Compare deals with their linked work orders.`
+- `Generate a leadership update.`
+- `Show receivables and collections by sector.`
 
 ## Architecture
 
@@ -60,7 +82,7 @@ BUSINESS_TIMEZONE=Asia/Kolkata
 
 Production mode always queries monday.com dynamically through GraphQL API version `2026-07`. It performs no mutations.
 
-The hosted prototype provided is configured for live Monday.com production mode.
+The hosted prototype is configured for live Monday.com production mode. Workbook data is not bundled into the hosted runtime.
 
 ### Local workbook demo mode
 
@@ -102,7 +124,9 @@ The E2E test starts the app in explicit demo mode, loads the supplied workbooks,
 4. Test `/api/health`, pipeline, work-order, linkage, and leadership prompts on the preview.
 5. Promote the verified preview using `vercel promote <preview-url>` or deploy with `vercel --prod`.
 
-Do not commit `.env.local`, `.vercel/project.json`, tokens, or workbook exports. A hosted URL cannot be produced without a Vercel account plus live monday.com credentials and board IDs.
+Do not commit `.env.local`, `.vercel/project.json`, tokens, or workbook exports. A fresh hosted deployment requires a Vercel account plus live monday.com credentials and board IDs.
+
+For a fresh deployment, verify that `/api/health` reports `dataSource: "monday"` before sharing the URL.
 
 ## Error behavior
 
@@ -111,9 +135,23 @@ Do not commit `.env.local`, `.vercel/project.json`, tokens, or workbook exports.
 - API authentication, network, GraphQL, rate-limit, configuration, and analysis failures return safe messages without tokens or upstream bodies.
 - Cross-board analysis never uses fuzzy guessing. Unmatched counts are disclosed.
 
+## Known limitations
+
+- The boards do not share an immutable deal ID, so cross-board linkage uses exact deal-name equality after trimming and case normalization.
+- Column mapping uses visible monday.com titles for portability; renamed expected columns appear as quality limitations until mappings are updated.
+- Quarter wording currently resolves to the available open-pipeline view rather than a configurable fiscal calendar.
+- The prototype does not include scheduled reports, presentation export, per-user authentication, or long-term snapshot storage.
+
+## Deliverables
+
+- **Hosted prototype:** [skylark-intelligence-kohl.vercel.app](https://skylark-intelligence-kohl.vercel.app)
+- **Decision Log:** [`docs/DECISION_LOG.md`](docs/DECISION_LOG.md)
+- **Architecture and setup instructions:** this README.
+- **Source archive:** generated locally as `Skylark-Intelligence-Submission.zip`.
+
 ## Submission archive
 
-The prepared archive is `Skylark-Intelligence-Submission.zip`. It excludes `.git`, `.env*`, dependencies, build/test output, source workbooks, and other secrets. Recreate it from tracked source if needed after running all verification commands.
+The submission archive is intentionally not committed. Generate `Skylark-Intelligence-Submission.zip` from tracked source after running all verification commands. It must exclude `.git`, `.env.local`, dependencies, build/test output, source workbooks, Vercel metadata, and other secrets.
 
 ## Key files
 
