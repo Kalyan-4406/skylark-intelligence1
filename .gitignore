@@ -10,3 +10,6 @@ test-results/
 *.zip
 Deal funnel Data.xlsx
 Work_Order_Tracker Data.xlsx
+Deal funnel Data.xlsx - Deal tracker.csv
+Work_Order_Tracker Data.xlsx - work order tracker.csv
+.vercel

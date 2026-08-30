@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/chat/route";
 
 const originalDataSource = process.env.DATA_SOURCE;
@@ -15,11 +15,14 @@ describe("POST /api/chat", () => {
   });
 
   it("sanitizes data-source failures", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
     process.env.DATA_SOURCE = "monday";
     const response = await POST(new Request("http://localhost/api/chat", { method: "POST", body: JSON.stringify({ messages: [{ role: "user", content: "Show pipeline" }] }) }));
     const body = await response.json();
     expect(response.status).toBe(503);
     expect(body.error.code).toBe("ANALYSIS_UNAVAILABLE");
     expect(JSON.stringify(body)).not.toContain("MONDAY_API_TOKEN");
+    expect(errorSpy).toHaveBeenCalledWith("Chat analysis failed.", { name: "ZodError" });
+    expect(JSON.stringify(errorSpy.mock.calls)).not.toContain("MONDAY_API_TOKEN");
   });
 });

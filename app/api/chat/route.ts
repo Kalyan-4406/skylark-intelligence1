@@ -3,6 +3,7 @@ import { z } from "zod";
 import { answerBusinessQuestion } from "@/lib/agent/answer";
 import { createOpenAIPlanner } from "@/lib/agent/openai";
 import { getServerConfig } from "@/lib/config";
+import { MondayApiError } from "@/lib/monday/client";
 import { createDataSource } from "@/lib/source-factory";
 
 export const runtime = "nodejs";
@@ -14,6 +15,17 @@ const requestSchema = z.object({
     content: z.string().trim().min(1).max(2_000),
   })).min(1).max(20),
 });
+
+function logAnalysisFailure(error: unknown) {
+  const details: { name: string; kind?: string; status?: number } = {
+    name: error instanceof Error ? error.name : "UnknownError",
+  };
+  if (error instanceof MondayApiError) {
+    details.kind = error.kind;
+    details.status = error.status;
+  }
+  console.error("Chat analysis failed.", details);
+}
 
 export async function POST(request: Request) {
   try {
@@ -34,7 +46,8 @@ export async function POST(request: Request) {
       planner,
     });
     return NextResponse.json(answer);
-  } catch {
+  } catch (error) {
+    logAnalysisFailure(error);
     return NextResponse.json(
       { error: { code: "ANALYSIS_UNAVAILABLE", message: "The analysis could not be completed. Check the data-source configuration and try again." } },
       { status: 503 },

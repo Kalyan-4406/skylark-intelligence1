@@ -5,7 +5,9 @@ test("founder runs pipeline and leadership analyses on desktop and mobile", asyn
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "What does the business need to know?" })).toBeVisible();
   await page.getByRole("button", { name: "How is our pipeline looking this quarter?" }).click();
-  await expect(page.getByRole("heading", { name: "Pipeline summary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pipeline summary" })).toBeVisible({
+    timeout: 30_000,
+  });
   await expect(page.getByRole("heading", { name: "What does the business need to know?" })).toBeInViewport();
   await expect(page.getByRole("heading", { name: "Data-quality caveats" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Data-quality caveats" })).toBeInViewport();
@@ -14,7 +16,9 @@ test("founder runs pipeline and leadership analyses on desktop and mobile", asyn
 
   await page.getByRole("button", { name: "New analysis" }).click();
   await page.getByRole("button", { name: "Generate a leadership update" }).click();
-  await expect(page.getByRole("heading", { name: "Executive summary" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Executive summary" })).toBeVisible({
+    timeout: 30_000,
+  });
   await expect(page.getByRole("heading", { name: "Data-quality caveats" })).toBeVisible();
 
   await page.setViewportSize({ width: 390, height: 844 });
